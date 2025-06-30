@@ -1,0 +1,11 @@
+---
+- name: copy playbook
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Copy WAR file to Tomcat webapps directory
+      copy:
+        src: /home/ubuntu/etc/ansible/playbooks/webapp/target/webapp.war
+        dest: /opt/tomcat/webapps/
+        mode: '0644'
