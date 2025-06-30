@@ -1,0 +1,26 @@
+pipeline {
+    agent any
+    
+    tools {
+        jdk "jdk21"
+        maven "maven3"
+    }
+
+    stages {
+        stage('git checkout') {
+            steps {
+                git changelog: false, poll: false, url: 'https://github.com/Nikhilgujela/hello-world-tomcat.git'
+            }
+        }
+        stage('maven build') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+        stage('Copy WAR to Ansible Server') {
+            steps {
+              sshPublisher(publishers: [sshPublisherDesc(configName: 'ansible-server', transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: 'ls -lh /home/ubuntu', execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: '/etc/ansible/playbooks', remoteDirectorySDF: false, removePrefix: '', sourceFiles: '**/target/*.war')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
+            }
+        }
+    }
+}
